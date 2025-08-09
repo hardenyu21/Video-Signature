@@ -1,0 +1,54 @@
+metadata_path: 'OpenVid/data/train/OpenVid-1M.csv'  # Path to the metadata
+train_dir: "OpenVid/train"   # Path to the training data directory
+val_dir: "OpenVid/eval"      # Path to the validation data directory
+num_train: 10000          # number of videos for train
+num_val: 100              # number of videos for validation
+
+# Model parameters
+msg_decoder_path: "ckpts/msg_decoder/dec_48b_whit.torchscript.pt"  # Path to the hidden decoder for the watermarking model
+num_bits: 48                   # Number of bits in the watermark
+model_id: 'damo-vilab/text-to-video-ms-1.7b'
+#model_id: 'stabilityai/stable-video-diffusion-img2vid-xt'
+
+# Training parameters
+batch_size: 2                # Batch size for training, it's recommended to fix this parameter to 1
+num_frames: 8                # Frames for each video
+frame_interval: 8            # Frame interval for sampleing
+img_size: 256                # Resize images to this size
+loss_i: "watson-vgg"         # Type of loss for the image loss. Can be watson-vgg, mse, watson-dft, etc.
+loss_w: "bce"                # Type of loss for the watermark loss. Can be mse or bce.
+loss_t: "watson-vgg"         # Type of loss for the temporal loss. Can be mse, mae.
+lambda_i: 0.2                # Weight of the image loss in the total loss
+lambda_t: 0.2                # Weight of the temporal loss in the total loss
+lambda_w: 1.0                # Weight of the watermark loss in the total loss
+alpha1: 1.0                  # Weight of the frame-level watermark loss in the total loss
+alpha2: 1.0                  # Weight of the watermark loss in the total loss
+optimizer: "AdamW"           # Optimizer
+lr: 5e-4                     # Learning rate
+weight_decay: 5e-5           # Weight decay
+
+freeze_layers:                # The layers to freeze for ModelScope, resulting from PAS we proposed
+  - "conv_in"
+  - "up_blocks.0.upsamplers.0.conv"
+  - "up_blocks.1.upsamplers.0.conv"
+  - "up_blocks.2.resnets.0.conv_shortcut"
+  - "up_blocks.2.upsamplers.0.conv"
+  - "up_blocks.3.resnets.0.conv_shortcut"
+  - "conv_out"
+#freeze_layers:                # For SVD 
+#  - "conv_in"
+#  - "mid_block.resnets.1.temporal_res_block.conv1"
+#  - "up_blocks.0.upsamplers.0.conv"
+#  - "up_blocks.1.upsamplers.0.conv"
+#  - "up_blocks.2.resnets.0.spatial_res_block.conv_shortcut"
+#  - "up_blocks.3.resnets.0.spatial_res_block.conv_shortcut"
+#  - "conv_out"
+#  - "time_conv_out"
+
+
+# Experiment parameters
+log_freq: 10
+output_dir: "output/finetune/modelscope"    # Output directory for logs and watermark keys
+log_file: "log.txt"                         # log file under output dir
+model_dir: "ckpts/vae/modelscope"          # Output directory for ckpts
+seed: 42                     # Random seed

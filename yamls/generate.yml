@@ -1,0 +1,31 @@
+# Data parameters
+prompt_file: "prompt.txt"      ## for Text-to-Video generation
+image_path: "SourceImages"    ## for Image-to-Video generation,  
+
+# Model parameters
+msg_decoder_path: "ckpts/msg_decoder/dec_48b_whit.torchscript.pt"  # Path to the hidden decoder for the watermarking model
+ckpt_path: "ckpts/vae/modelscope/checkpoint.pth"
+#ckpt_path: "ckpts/vae/svd/checkpoint.pth"
+
+model_id: 'damo-vilab/text-to-video-ms-1.7b'
+#model_id: 'stabilityai/stable-video-diffusion-img2vid-xt'
+#model_id: "maxin-cn/Latte-1"
+
+height: 512
+width: 512
+num_frames: 16
+num_inference_steps: 50
+
+nw_saved_dir: "output/videos/modelscope/original"            
+w_saved_dir: "output/videos/modelscope/video_signature"
+#nw_saved_dir: "output/videos/modelscope/svd"
+#w_saved_dir: "output/videos/modelscope/svd"
+#nw_saved_dir: "output/videos/latte/original"
+#w_saved_dir: "output/videos/latte/video_signature"
+
+key: "100011100001001101101100100011111101111110000000" #replace the key generated during the finetuning
+seed:
+  - 42
+  - 114514
+  - 0
+  - 6666
