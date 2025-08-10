@@ -4,7 +4,6 @@ This repository contains the implementation for the paper "Video Signature: In-g
 ### Install Dependencies
 Basic Dependencies:
 * Python >= 3.10
-Then run:
 ```shell
 pip install -r requirements.txt
 ```
