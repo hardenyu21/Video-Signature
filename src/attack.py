@@ -21,17 +21,16 @@ from collections import defaultdict
 from src.utils.param_utils import seed_all
 from torch.utils.data import Dataset
 
-
-default_transform = transforms.Compose([transforms.ToTensor()])
-normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],  
-                                std=[0.229, 0.224, 0.225])
-
 import time
 from torchvision import transforms
 from torchvision.transforms import GaussianBlur
 import random
 from src.utils import data_utils
 import torchvision
+
+default_transform = transforms.Compose([transforms.ToTensor()])
+normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],  
+                                std=[0.229, 0.224, 0.225])
 
 ATTACKS = ["clean", "gaussian_noise",
             "brightness", "gaussian_blur", 
@@ -255,14 +254,11 @@ def main():
     dataloader = DataLoader(video_dataset, batch_size=1, shuffle=False, num_workers=16)
     for _, frames in enumerate(dataloader):
         frames = frames.to(device).squeeze(0).to(torch.float32)
-        keys = key.repeat(frames.shape[0], 1)
         with torch.no_grad():
             decoded = msg_decoder(frames)
             binarized = (decoded > 0).int()
             votes = binarized.sum(dim=0)  
             majority = (votes > (decoded.size(0) // 2)).int().reshape(key.shape)  
-        diff = (~torch.logical_xor(decoded>0, keys>0)) # b k -> b
-        bit_accs = (torch.sum(diff, dim=-1) / diff.shape[-1]).mean().item() # b k -> b
         diff_video = (~torch.logical_xor(majority, key>0))
         bit_video_acc = torch.sum(diff_video).item() / diff_video.numel()
         match_bit = torch.sum(diff_video).item()
@@ -270,11 +266,10 @@ def main():
             threshold = match_thresholds[j]
             is_success = match_bit >= threshold
             tprs[fpr].append(int(is_success))
+        
+        accuracys.append(bit_video_acc)
 
-    accuracys[params.attack_type].append(bit_video_acc)
-    print(f'{params.attack_type} accuracy: {bit_video_acc}')
-
-    with open(os.path.join(params.output_dir, 'output_tpr.txt'), 'a') as f:
+    with open(os.path.join(params.output_dir, 'log.txt'), 'a') as f:
         f.write(f'{params.attack_type} {params.factor}\n')     
         for fpr in fprs:
             f.write(f'{params.attack_type} fpr = {fpr}: {np.mean(tprs[fpr])}\n')

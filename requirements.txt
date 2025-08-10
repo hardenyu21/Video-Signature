@@ -1,0 +1,14 @@
+augly==1.0.0
+diffusers==0.33.1
+lpips==0.1.4
+numpy==2.3.2
+omegaconf==2.3.0
+opencv_python==4.12.0.88
+opencv_python_headless==4.12.0.88
+pandas==2.3.1
+Pillow==11.3.0
+torch==2.7.1
+torchmetrics==1.8.1
+torchvision==0.22.1
+tqdm==4.67.1
+wandb==0.21.1

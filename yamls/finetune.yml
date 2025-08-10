@@ -1,4 +1,4 @@
-metadata_path: 'OpenVid/data/train/OpenVid-1M.csv'  # Path to the metadata
+metadata_path: 'OpenVid/OpenVid-1M.csv'  # Path to the metadata
 train_dir: "OpenVid/train"   # Path to the training data directory
 val_dir: "OpenVid/eval"      # Path to the validation data directory
 num_train: 10000          # number of videos for train

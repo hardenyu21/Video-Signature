@@ -94,12 +94,12 @@ def main(params):
     watermarked_vae = copy.deepcopy(pipe.vae)
     watermarked_vae.load_state_dict(torch.load(params.ckpt_path, map_location = 'cpu'))
     watermarked_vae.to(torch.float16)
-
-    if not os.path.exists(params.nw_saved_dir):
-        os.makedirs(params.nw_saved_dir)
     
-    if not os.path.exists(params.w_saved_dir):
-        os.makedirs(params.w_saved_dir)
+    os.makedirs(os.path.join(params.nw_saved_dir, 'videos'), exist_ok=True)
+    os.makedirs(os.path.join(params.nw_saved_dir, 'frames'), exist_ok=True)
+    
+    os.makedirs(os.path.join(params.w_saved_dir, 'videos'), exist_ok=True)
+    os.makedirs(os.path.join(params.w_saved_dir, 'frames'), exist_ok=True)
 
     bit_accuracy = []
     video_bit_accuracy = []
@@ -151,8 +151,8 @@ def main(params):
             video_bit_accuracy.append(bit_video_acc)
 
     with open(os.path.join(params.output_dir, 'log.txt'), 'a') as f:
-        f.write(f'bit acc: {np.mean(bit_accuracy)}\n')
-        f.write(f'video bit acc: {np.mean(video_bit_accuracy)}\n')
+        f.write(f'bit acc ms: {np.mean(bit_accuracy)}\n')
+        f.write(f'video bit acc ms: {np.mean(video_bit_accuracy)}\n')
         f.write(f'average detect time: {np.mean(detect_time)}\n')
     
 if __name__ == "__main__":
@@ -160,6 +160,6 @@ if __name__ == "__main__":
     import warnings
     warnings.filterwarnings("ignore")
     
-    yaml_path = 'yamls/generate.yml'
+    yaml_path = 'yamls/generate_ms.yml'
     params = get_params(yaml_path)
     main(params)

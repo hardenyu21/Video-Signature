@@ -14,10 +14,11 @@ model_id: 'damo-vilab/text-to-video-ms-1.7b'
 height: 512
 width: 512
 num_frames: 16
-num_inference_steps: 50
+#num_inference_steps: 50
 
 nw_saved_dir: "output/videos/modelscope/original"            
 w_saved_dir: "output/videos/modelscope/video_signature"
+
 #nw_saved_dir: "output/videos/modelscope/svd"
 #w_saved_dir: "output/videos/modelscope/svd"
 #nw_saved_dir: "output/videos/latte/original"

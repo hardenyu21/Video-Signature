@@ -120,8 +120,8 @@ def main(params):
             video_bit_accuracy.append(bit_video_acc)
 
     with open(os.path.join(params.output_dir, 'log.txt'), 'a') as f:
-        f.write(f'bit acc: {np.mean(bit_accuracy)}\n')
-        f.write(f'video bit acc: {np.mean(video_bit_accuracy)}\n')
+        f.write(f'bit acc svd: {np.mean(bit_accuracy)}\n')
+        f.write(f'video bit acc svd: {np.mean(video_bit_accuracy)}\n')
         f.write(f'average decode time: {np.mean(decode_time)}\n')
     f.close()
     

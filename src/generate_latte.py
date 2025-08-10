@@ -76,13 +76,13 @@ def main(params):
     msg_decoder.to(pipe.vae.dtype)
 
 
-    if not os.path.exists(params.nw_saved_dir):
-        os.makedirs(params.nw_saved_dir)
+    os.makedirs(os.path.join(params.nw_saved_dir, 'videos'), exist_ok=True)
+    os.makedirs(os.path.join(params.nw_saved_dir, 'frames'), exist_ok=True)
     
-    if not os.path.exists(params.w_saved_dir_ms):
-        os.makedirs(params.w_saved_dir_ms)
-    if not os.path.exists(params.w_saved_dir_svd):
-        os.makedirs(params.w_saved_dir_svd)
+    os.makedirs(os.path.join(params.w_saved_dir, 'videos_ms'), exist_ok=True)
+    os.makedirs(os.path.join(params.w_saved_dir, 'frames_ms'), exist_ok=True)
+    os.makedirs(os.path.join(params.w_saved_dir, 'videos_svd'), exist_ok=True)
+    os.makedirs(os.path.join(params.w_saved_dir, 'frames_svd'), exist_ok=True)
 
     bit_accuracy = []
     video_bit_accuracy = []
@@ -100,8 +100,8 @@ def main(params):
                         generator = generator
                         ).frames[0]
             nw_frames = np.stack([np.array(img.convert("RGB")) for img in nw_frames]) / 255.0
-            export_to_video(nw_frames, os.path.join(params.nw_saved_dir, f"{i * len(params.seed) + j}.mp4"))
-            np.save(os.path.join('./frame_array/original/latte', f"{i * len(params.seed) + j}.npy"), nw_frames)
+            export_to_video(nw_frames, os.path.join(params.nw_saved_dir, 'videos', f"{i * len(params.seed) + j}.mp4"))
+            np.save(os.path.join(params.nw_saved_dir, 'frames', f"{i * len(params.seed) + j}.npy"), nw_frames)
     
     pipe.vae = watermarked_vae_ms
     for i, prompt in enumerate(prompts):
@@ -116,8 +116,8 @@ def main(params):
                         generator = generator
                         ).frames[0]
             w_frames = np.stack([np.array(img.convert("RGB")) for img in w_frames]) / 255.0
-            export_to_video(w_frames, os.path.join(params.w_saved_dir_ms, f"{i * len(params.seed) + j}.mp4"))
-            np.save(os.path.join('./frame_array/vidsig/latte_ms', f"{i * len(params.seed) + j}.npy"), w_frames)
+            export_to_video(w_frames, os.path.join(params.w_saved_dir, 'videos_ms', f"{i * len(params.seed) + j}.mp4"))
+            np.save(os.path.join(params.w_saved_dir, 'frames_ms', f"{i * len(params.seed) + j}.npy"), w_frames)
             w_frames = transform_video(w_frames).to(pipe.vae.dtype).to(device)  
  
             decoded = msg_decoder(w_frames)
@@ -134,9 +134,9 @@ def main(params):
             print(f'video bit acc: {bit_video_acc}')
     print(np.mean(bit_accuracy))
     print(np.mean(video_bit_accuracy))
-    with open('output/rvm/latte/log.txt', 'a') as f:
-        f.write(f'bit acc: {np.mean(bit_accuracy)}\n')
-        f.write(f'video bit acc: {np.mean(video_bit_accuracy)}\n')
+    with open(os.path.join(params.output_dir, 'log.txt'), 'a') as f:
+        f.write(f'bit acc latte_ms: {np.mean(bit_accuracy)}\n')
+        f.write(f'video bit acc latte_ms: {np.mean(video_bit_accuracy)}\n')
     f.close()
 
     pipe.vae = watermarked_vae_svd
@@ -153,8 +153,8 @@ def main(params):
                         generator = generator
                         ).frames[0]
             w_frames = np.stack([np.array(img.convert("RGB")) for img in w_frames]) / 255.0
-            export_to_video(w_frames, os.path.join(params.w_saved_dir_svd, f"{i * len(params.seed) + j}.mp4"))
-            np.save(os.path.join('./frame_array/vidsig/latte_svd', f"{i * len(params.seed) + j}.npy"), w_frames)
+            export_to_video(w_frames, os.path.join(params.w_saved_dir, 'videos_svd', f"{i * len(params.seed) + j}.mp4"))
+            np.save(os.path.join(params.w_saved_dir, 'frames_svd', f"{i * len(params.seed) + j}.npy"), w_frames)
             w_frames = transform_video(w_frames).to(pipe.vae.dtype).to(device)  
 
             decoded = msg_decoder(w_frames)
@@ -171,14 +171,14 @@ def main(params):
             print(f'video bit acc: {bit_video_acc}')
     print(np.mean(bit_accuracy))
     print(np.mean(video_bit_accuracy))
-    with open('output/rvm/latte/log.txt', 'a') as f:
-        f.write(f'bit acc: {np.mean(bit_accuracy)}\n')
-        f.write(f'video bit acc: {np.mean(video_bit_accuracy)}\n')
+    with open(os.path.join(params.output_dir, 'log.txt'), 'a') as f:
+        f.write(f'bit acc latte_svd: {np.mean(bit_accuracy)}\n')
+        f.write(f'video bit acc latte_svd: {np.mean(video_bit_accuracy)}\n')
     f.close()
 
 if __name__ == "__main__":
     
     
-    yaml_path = './yamls/latte.yml'
+    yaml_path = './yamls/generate_latte.yml'
     params = get_params(yaml_path)
     main(params)
