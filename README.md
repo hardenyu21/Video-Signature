@@ -41,7 +41,7 @@ If you want to finetune by yourself, you can download the dataset from [OpenVid]
 
 Once you download the dataset, you can finetune your own watermarked model by
 ```shell
-python src/finetune.py
+python src/finetune/train.py
 ```
 
 ## Citation

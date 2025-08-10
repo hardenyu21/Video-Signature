@@ -85,7 +85,12 @@ class Trainer():
         self.watermark_key = self._generate_key(params.num_bits)
         #Initialize vae decoder and msg_decode
         
-        self.vae = AutoencoderKL.from_pretrained(params.model_id, subfolder = "vae") 
+        if params.model_id == 'damo-vilab/text-to-video-ms-1.7b':
+            self.vae = AutoencoderKL.from_pretrained(params.model_id, subfolder = "vae") 
+        elif params.model_id == 'stabilityai/stable-video-diffusion-img2vid-xt':
+            self.vae = AutoencoderKLTemporalDecoder.from_pretrained(params.model_id, subfolder = "vae") 
+        else:
+            raise ValueError(f"Model {params.model_id} not supported")
         #except:
         #self.vae = AutoencoderKLTemporalDecoder.from_pretrained(params.model_id, subfolder = "vae") 
         self.finetuned_vae = self._build_finetuned_vae(params)   ##requires_grad = True
@@ -159,17 +164,7 @@ class Trainer():
             msg_decoder_params.requires_grad = False
         msg_decoder.eval()
         return msg_decoder
-    
-    """
-    def _load_temporal_extractor(self):
 
-        model = torch.hub.load('facebookresearch/pytorchvideo', 'slow_r50', pretrained=True)
-        model.blocks[-1].proj = nn.Identity()
-        model.to(self.device)
-        model.eval()
-    
-        return model
-    """
 
     def _get_dataloader(self, params) -> Tuple[DataLoader, DataLoader]:
 
@@ -365,10 +360,6 @@ class Trainer():
                 'resize_07': lambda x: data_utils.resize(x, 0.7),
                 'brightness_1p5': lambda x: data_utils.adjust_brightness(x, 1.5),
                 'brightness_2': lambda x: data_utils.adjust_brightness(x, 2),
-                'gaussian_blur_3': lambda x: data_utils.gaussian_blur(x, 3),
-                'gaussian_noise_01': lambda x: data_utils.gaussian_noise(x, 0.1),
-                'jpeg_80': lambda x: data_utils.jpeg_compress(x, 80),
-                'jpeg_50': lambda x: data_utils.jpeg_compress(x, 50),
             }
             for name, attack in attacks.items():
                 imgs_aug = attack(vqgan_to_imnet(imgs_w))
